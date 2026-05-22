@@ -8,6 +8,7 @@ import { initializeScrollReveal } from './ui/scrollReveal.js';
 import { handleFormSubmission } from './ui/formHandler.js';
 import { setupNavHighlight } from './ui/navHighlight.js';
 import { initializeScrollToTop } from './ui/scrollToTop.js';
+import { initMobileNav } from './ui/mobileNav.js';
 
 /**
  * Initialize all KRA modules on DOMContentLoaded
@@ -18,6 +19,7 @@ function initialize() {
   handleFormSubmission();
   setupNavHighlight();
   initializeScrollToTop();
+  initMobileNav();
 }
 
 // Run on page load
