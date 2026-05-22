@@ -1,0 +1,16 @@
+import { defineConfig } from 'vite';
+
+export default defineConfig({
+  root: '.',
+  server: {
+    port: 5173,
+    open: true,
+    strictPort: false,
+  },
+  build: {
+    target: 'esnext',
+    minify: 'terser',
+    outDir: 'dist',
+    emptyOutDir: true,
+  },
+});

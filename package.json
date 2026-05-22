@@ -1,0 +1,29 @@
+{
+  "name": "kra-academy",
+  "version": "0.1.0",
+  "description": "KemKnightRanger Academy — Single-page landing site with Vite + Vitest",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest",
+    "test:watch": "vitest --watch",
+    "test:coverage": "vitest --coverage"
+  },
+  "devDependencies": {
+    "happy-dom": "^12.0.0",
+    "terser": "^5.48.0",
+    "vite": "^5.0.0",
+    "vitest": "^1.0.0"
+  },
+  "keywords": [
+    "academy",
+    "education",
+    "strategic-gaming",
+    "steam",
+    "lineage-research"
+  ],
+  "author": "Olu AnuAkin Akinyemi",
+  "license": "MIT"
+}
