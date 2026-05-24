@@ -273,21 +273,34 @@ nav{
 /* Timbuktu arch SVG background */
 .arch-frame{
   position:absolute;
-  bottom:0;left:50%;transform:translateX(-50%);
+  bottom:0;left:50%;
+  width:90vw;                          /* fallback for browsers without min() */
   width:min(700px,90vw);
+  height:auto;
+  aspect-ratio:700/420;                /* iOS Safari sometimes drops viewBox-derived height */
+  display:block;                       /* avoid inline-svg sizing quirks */
   opacity:0.06;
   pointer-events:none;
+  transform:translateX(-50%);
+  z-index:1;
 }
 
 /* Celestial ring */
 .celestial-ring{
   position:absolute;
   top:50%;left:50%;
-  width:min(640px,85vw);height:min(640px,85vw);
-  transform:translate(-50%,-50%);
+  width:85vw;                          /* fallback */
+  width:min(640px,85vw);
+  height:85vw;                         /* fallback */
+  height:min(640px,85vw);
+  max-width:100%;max-height:100%;      /* never overflow the (overflow:hidden) parent */
+  display:block;
   opacity:0.05;
-  animation:slowSpin 90s linear infinite;
   pointer-events:none;
+  transform:translate(-50%,-50%);
+  transform-origin:center center;      /* defend against iOS origin quirks on animated transforms */
+  animation:slowSpin 90s linear infinite;
+  z-index:1;
 }
 @keyframes slowSpin{
   from{transform:translate(-50%,-50%) rotate(0deg);}
