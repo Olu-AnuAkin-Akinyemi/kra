@@ -16,7 +16,8 @@ export async function onRequestPost({ request, env }) {
   try {
     await insertSubmission(env.DB, result.data);
     return json({ ok: true });
-  } catch {
+  } catch (err) {
+    console.error('submit failed:', err?.message, err?.stack, 'DB bound:', !!env.DB);
     return json({ ok: false, error: 'Submission failed' }, 500);
   }
 }
