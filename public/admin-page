@@ -119,6 +119,108 @@
 
   .empty { text-align: center; padding: 60px 20px; color: var(--parch-dk); font-style: italic; }
 
+  /* Toolbar actions (right side: print, delete) */
+  .toolbar-actions { display: flex; gap: 10px; margin-left: auto; }
+  .btn:disabled { opacity: 0.35; cursor: not-allowed; }
+  .btn:disabled:hover { color: var(--parch-dim); border-color: var(--panel); background: transparent; }
+  .btn-danger {
+    background: transparent; color: #E5A07A;
+    border-color: #5C2418;
+  }
+  .btn-danger:hover:not(:disabled) {
+    background: #5C2418; color: var(--parch); border-color: #7A2F1F;
+  }
+
+  /* Selection column */
+  th.col-check, td.col-check {
+    width: 36px; padding-right: 4px;
+    text-align: center; vertical-align: middle;
+  }
+  th.col-check { cursor: default; }
+  th.col-check:hover { color: var(--parch-dk); }
+  .col-check input[type="checkbox"] {
+    width: 16px; height: 16px;
+    accent-color: var(--ember);
+    cursor: pointer; margin: 0; vertical-align: middle;
+  }
+  tbody tr.selected { background: rgba(193, 125, 42, 0.08); }
+  tbody tr.selected:hover { background: rgba(193, 125, 42, 0.12); }
+
+  /* Modal */
+  .modal-backdrop {
+    position: fixed; inset: 0;
+    background: rgba(12, 14, 24, 0.82);
+    -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px; z-index: 100;
+    animation: fade-in 0.15s ease;
+  }
+  .modal {
+    background: var(--chamber); border: 1px solid var(--panel); border-radius: 4px;
+    padding: 32px; max-width: 460px; width: 100%;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    animation: modal-in 0.2s ease;
+  }
+  .modal h2 {
+    font-family: 'Cinzel', serif; font-weight: 600;
+    color: var(--parch); margin: 0 0 12px; font-size: 18px;
+    letter-spacing: 0.06em; text-transform: uppercase;
+  }
+  .modal p { color: var(--parch-dim); margin: 0 0 12px; font-size: 15px; line-height: 1.5; }
+  .modal .danger-count { color: #E5A07A; font-weight: 600; }
+  .modal .field { margin: 16px 0 0; }
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+  @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes modal-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Print-only header (hidden on screen) */
+  .print-meta { display: none; }
+
+  /* Print stylesheet */
+  @media print {
+    body {
+      background: white !important; color: black !important;
+      padding: 0; font-size: 11pt;
+    }
+    .shell { max-width: none; }
+    .toolbar, .modal-backdrop, .head .meta { display: none !important; }
+    .print-meta {
+      display: block !important;
+      font-family: 'Jost', sans-serif; font-size: 10pt;
+      color: #333; margin: 0 0 14px;
+    }
+    .head { border-color: black; padding-bottom: 12px; margin-bottom: 14px; }
+    .brand { color: black !important; font-size: 18pt; }
+    .sub { color: #333 !important; }
+    .tbl-wrap { overflow: visible; border: none; border-radius: 0; }
+    table { font-size: 10pt; }
+    thead {
+      background: white !important; color: black !important;
+      border-bottom: 1.5pt solid black;
+    }
+    th, td {
+      padding: 6pt 8pt;
+      border-bottom: 0.5pt solid #999 !important;
+      color: black !important;
+      page-break-inside: avoid;
+    }
+    th { font-weight: 600; }
+    tbody tr { page-break-inside: avoid; }
+    tbody tr:hover, tbody tr.selected, tbody tr.selected:hover {
+      background: transparent !important;
+    }
+    td.col-when, td.col-type, td.col-name, td.col-email,
+    td.col-role, td.col-msg, td.col-status {
+      color: black !important; white-space: normal;
+    }
+    td.col-msg { max-width: none; }
+    th.col-check, td.col-check { display: none !important; }
+    @page { margin: 0.5in; }
+  }
+
   /* Mobile */
   @media (max-width: 720px) {
     body { padding: 20px 14px; }
@@ -205,13 +307,128 @@
     shell.appendChild(form);
   }
 
+  function openConfirmModal({ count, trigger, onConfirm }) {
+    const backdrop = el('div', {
+      class: 'modal-backdrop',
+      role: 'dialog',
+      'aria-modal': 'true',
+      'aria-labelledby': 'confirm-title',
+    });
+    const modal = el('div', { class: 'modal' });
+
+    modal.appendChild(el('h2', { id: 'confirm-title' }, 'Confirm deletion'));
+
+    const noun = count === 1 ? 'submission' : 'submissions';
+    const p1 = el('p');
+    p1.appendChild(document.createTextNode('This will permanently delete '));
+    p1.appendChild(el('span', { class: 'danger-count' }, `${count} ${noun}`));
+    p1.appendChild(document.createTextNode('. This cannot be undone.'));
+    modal.appendChild(p1);
+
+    modal.appendChild(el('p', {}, 'Type DELETE (all caps) to confirm.'));
+
+    const field = el('div', { class: 'field' });
+    const input = el('input', {
+      type: 'text',
+      autocomplete: 'off',
+      spellcheck: 'false',
+      'aria-label': 'Type DELETE to confirm',
+    });
+    field.appendChild(input);
+    modal.appendChild(field);
+
+    const err = el('div', { class: 'err' });
+    modal.appendChild(err);
+
+    const actions = el('div', { class: 'modal-actions' });
+    const cancelBtn = el('button', { class: 'btn', type: 'button' }, 'Cancel');
+    const confirmBtn = el('button', { class: 'btn btn-danger', type: 'button' }, 'Delete');
+    confirmBtn.disabled = true;
+    actions.appendChild(cancelBtn);
+    actions.appendChild(confirmBtn);
+    modal.appendChild(actions);
+
+    backdrop.appendChild(modal);
+
+    let busy = false;
+    const prevOverflow = document.body.style.overflow;
+
+    function close() {
+      if (busy) return;
+      document.removeEventListener('keydown', onKey);
+      backdrop.remove();
+      document.body.style.overflow = prevOverflow;
+      if (trigger && typeof trigger.focus === 'function') trigger.focus();
+    }
+
+    function onKey(e) {
+      if (e.key === 'Escape') { e.preventDefault(); close(); return; }
+      if (e.key === 'Tab') {
+        const focusable = modal.querySelectorAll('input, button:not([disabled])');
+        if (focusable.length === 0) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault(); last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault(); first.focus();
+        }
+      }
+    }
+
+    input.addEventListener('input', () => {
+      confirmBtn.disabled = input.value !== 'DELETE' || busy;
+    });
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && input.value === 'DELETE' && !busy) {
+        e.preventDefault();
+        confirmBtn.click();
+      }
+    });
+
+    cancelBtn.addEventListener('click', close);
+    backdrop.addEventListener('click', (e) => { if (e.target === backdrop) close(); });
+
+    confirmBtn.addEventListener('click', async () => {
+      if (input.value !== 'DELETE' || busy) return;
+      busy = true;
+      confirmBtn.disabled = true;
+      cancelBtn.disabled = true;
+      input.disabled = true;
+      confirmBtn.textContent = 'Deleting…';
+      err.textContent = '';
+      try {
+        await onConfirm();
+        busy = false;
+        close();
+      } catch (e) {
+        busy = false;
+        cancelBtn.disabled = false;
+        input.disabled = false;
+        confirmBtn.textContent = 'Delete';
+        confirmBtn.disabled = input.value !== 'DELETE';
+        err.textContent = e?.message || 'Delete failed';
+        input.focus();
+      }
+    });
+
+    document.addEventListener('keydown', onKey);
+    document.body.style.overflow = 'hidden';
+    document.body.appendChild(backdrop);
+    setTimeout(() => input.focus(), 0);
+  }
+
   function renderTable(payload) {
     shell.replaceChildren();
+
+    const selected = new Set();
+    let visibleIds = [];
 
     const head = el('header', { class: 'head' });
     const titles = el('div');
     titles.appendChild(el('h1', { class: 'brand' }, 'The Scriptorium'));
-    titles.appendChild(el('p', { class: 'sub' }, `${payload.count} submission${payload.count === 1 ? '' : 's'}`));
+    const subEl = el('p', { class: 'sub' }, `${payload.count} submission${payload.count === 1 ? '' : 's'}`);
+    titles.appendChild(subEl);
     head.appendChild(titles);
 
     const actions = el('div', { class: 'meta' });
@@ -219,6 +436,9 @@
     actions.appendChild(logout);
     head.appendChild(actions);
     shell.appendChild(head);
+
+    const printMeta = el('div', { class: 'print-meta' });
+    shell.appendChild(printMeta);
 
     const toolbar = el('div', { class: 'toolbar' });
     const search = el('input', { type: 'search', placeholder: 'Search name, email, message…' });
@@ -228,12 +448,26 @@
     typeFilter.appendChild(el('option', { value: 'circle' }, 'Community'));
     toolbar.appendChild(search);
     toolbar.appendChild(typeFilter);
+
+    const toolbarActions = el('div', { class: 'toolbar-actions' });
+    const printBtn = el('button', { class: 'btn', type: 'button', onclick: () => window.print() }, 'Print');
+    const deleteBtn = el('button', { class: 'btn btn-danger', type: 'button' }, 'Delete selected');
+    deleteBtn.disabled = true;
+    toolbarActions.appendChild(printBtn);
+    toolbarActions.appendChild(deleteBtn);
+    toolbar.appendChild(toolbarActions);
     shell.appendChild(toolbar);
 
     const wrap = el('div', { class: 'tbl-wrap' });
     const table = el('table');
     const thead = el('thead');
     const headRow = el('tr');
+
+    const masterTh = el('th', { class: 'col-check' });
+    const masterCheck = el('input', { type: 'checkbox', 'aria-label': 'Select all visible rows' });
+    masterTh.appendChild(masterCheck);
+    headRow.appendChild(masterTh);
+
     const cols = [
       { key: 'created_at', label: 'When' },
       { key: 'type', label: 'Type' },
@@ -257,6 +491,45 @@
     wrap.appendChild(table);
     shell.appendChild(wrap);
 
+    function updateDeleteBtn() {
+      const n = selected.size;
+      deleteBtn.disabled = n === 0;
+      deleteBtn.textContent = n === 0 ? 'Delete selected' : `Delete selected (${n})`;
+    }
+
+    function updateMasterCheck() {
+      if (visibleIds.length === 0) {
+        masterCheck.checked = false;
+        masterCheck.indeterminate = false;
+        masterCheck.disabled = true;
+        return;
+      }
+      masterCheck.disabled = false;
+      const visibleSet = new Set(visibleIds);
+      let selectedVisible = 0;
+      for (const id of selected) if (visibleSet.has(id)) selectedVisible++;
+      if (selectedVisible === 0) {
+        masterCheck.checked = false;
+        masterCheck.indeterminate = false;
+      } else if (selectedVisible === visibleIds.length) {
+        masterCheck.checked = true;
+        masterCheck.indeterminate = false;
+      } else {
+        masterCheck.checked = false;
+        masterCheck.indeterminate = true;
+      }
+    }
+
+    function updatePrintMeta() {
+      const parts = [`Printed ${new Date().toLocaleString()}`];
+      const filterBits = [];
+      if (typeFilter.value) filterBits.push(`type=${typeFilter.value === 'teacher' ? 'Teacher' : 'Community'}`);
+      if (search.value.trim()) filterBits.push(`search="${search.value.trim()}"`);
+      if (filterBits.length) parts.push(`Filters: ${filterBits.join(', ')}`);
+      parts.push(`${visibleIds.length} of ${payload.count} submissions`);
+      printMeta.textContent = parts.join(' · ');
+    }
+
     function redraw() {
       tbody.replaceChildren();
       const q = search.value.trim().toLowerCase();
@@ -279,15 +552,38 @@
           return 0;
         });
 
+      visibleIds = filtered.map((s) => s.id);
+      const visibleSet = new Set(visibleIds);
+      for (const id of [...selected]) {
+        if (!visibleSet.has(id)) selected.delete(id);
+      }
+
       if (filtered.length === 0) {
         const row = el('tr');
-        row.appendChild(el('td', { colspan: '7', class: 'empty' }, q || t ? 'No matches.' : 'No submissions yet. The gates are quiet.'));
+        row.appendChild(el('td', { colspan: '8', class: 'empty' }, q || t ? 'No matches.' : 'No submissions yet. The gates are quiet.'));
         tbody.appendChild(row);
+        updateDeleteBtn();
+        updateMasterCheck();
+        updatePrintMeta();
         return;
       }
 
       for (const s of filtered) {
         const tr = el('tr');
+        if (selected.has(s.id)) tr.classList.add('selected');
+
+        const checkTd = el('td', { class: 'col-check' });
+        const rowCheck = el('input', { type: 'checkbox', 'aria-label': `Select submission ${s.id}` });
+        rowCheck.checked = selected.has(s.id);
+        rowCheck.addEventListener('change', () => {
+          if (rowCheck.checked) { selected.add(s.id); tr.classList.add('selected'); }
+          else { selected.delete(s.id); tr.classList.remove('selected'); }
+          updateDeleteBtn();
+          updateMasterCheck();
+        });
+        checkTd.appendChild(rowCheck);
+        tr.appendChild(checkTd);
+
         tr.appendChild(el('td', { class: 'col-when' }, fmtDate(s.created_at)));
         tr.appendChild(el('td', { class: 'col-type' }, s.type === 'teacher' ? 'Teacher' : 'Community'));
         tr.appendChild(el('td', { class: 'col-name' }, s.name || ''));
@@ -297,7 +593,49 @@
         tr.appendChild(el('td', { class: 'col-status' }, s.status || ''));
         tbody.appendChild(tr);
       }
+
+      updateDeleteBtn();
+      updateMasterCheck();
+      updatePrintMeta();
     }
+
+    masterCheck.addEventListener('change', () => {
+      if (masterCheck.checked) {
+        for (const id of visibleIds) selected.add(id);
+      } else {
+        for (const id of visibleIds) selected.delete(id);
+      }
+      redraw();
+    });
+
+    deleteBtn.addEventListener('click', () => {
+      if (selected.size === 0) return;
+      const ids = [...selected];
+      openConfirmModal({
+        count: ids.length,
+        trigger: deleteBtn,
+        onConfirm: async () => {
+          const res = await fetch('/api/admin/delete', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'same-origin',
+            body: JSON.stringify({ ids }),
+          });
+          if (!res.ok) {
+            const j = await res.json().catch(() => ({}));
+            throw new Error(j.error || `Delete failed (${res.status})`);
+          }
+          const data = await res.json();
+          const deletedSet = new Set(ids);
+          payload.submissions = payload.submissions.filter((s) => !deletedSet.has(s.id));
+          payload.count = payload.submissions.length;
+          subEl.textContent = `${payload.count} submission${payload.count === 1 ? '' : 's'}`;
+          selected.clear();
+          redraw();
+          return data.deleted;
+        },
+      });
+    });
 
     search.addEventListener('input', redraw);
     typeFilter.addEventListener('change', redraw);

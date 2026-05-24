@@ -16,3 +16,14 @@ export async function listSubmissions(db, limit = 500) {
     .all();
   return results;
 }
+
+export async function deleteSubmissions(db, ids) {
+  const clean = [...new Set(ids.map(Number).filter((n) => Number.isInteger(n) && n > 0))];
+  if (clean.length === 0) return 0;
+  const placeholders = clean.map(() => '?').join(', ');
+  const { meta } = await db
+    .prepare(`DELETE FROM submissions WHERE id IN (${placeholders})`)
+    .bind(...clean)
+    .run();
+  return meta?.changes ?? 0;
+}
