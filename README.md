@@ -10,6 +10,7 @@ An immersive academy rooted in an ancient philosophy known as Ma'at — where st
 - **Build** — [Vite](https://vitejs.dev/) v5
 - **Tests** — [Vitest](https://vitest.dev/) v1 + happy-dom
 
+
 ## Project Structure
 
 ```
