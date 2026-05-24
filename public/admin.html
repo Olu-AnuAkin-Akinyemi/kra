@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>The Scriptorium — KRA Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Cinzel:wght@400;600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0C0E18;
+    --deep: #101422;
+    --chamber: #161C2E;
+    --panel: #1C2438;
+    --ember: #C17D2A;
+    --ember-lt: #DFA455;
+    --ember-dim: #7A4E18;
+    --terra: #7C3B1E;
+    --parch: #E8DFC8;
+    --parch-dim: #B8A882;
+    --parch-dk: #7A6E56;
+    --star: #C8D8F0;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--ink); color: var(--parch); font-family: 'Cormorant Garamond', Georgia, serif; min-height: 100vh; }
+  body { padding: 32px 24px; }
+  a { color: var(--ember-lt); text-decoration: none; }
+
+  .shell { max-width: 1200px; margin: 0 auto; }
+
+  .head {
+    display: flex; justify-content: space-between; align-items: flex-end;
+    gap: 16px; flex-wrap: wrap;
+    padding-bottom: 20px; margin-bottom: 28px;
+    border-bottom: 1px solid var(--panel);
+  }
+  .brand { font-family: 'Cinzel', serif; font-weight: 600; color: var(--parch); font-size: 22px; letter-spacing: 0.08em; text-transform: uppercase; margin: 0; }
+  .sub { font-family: 'Jost', sans-serif; color: var(--parch-dk); font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; margin: 4px 0 0; }
+  .meta { font-family: 'Jost', sans-serif; color: var(--parch-dim); font-size: 13px; display: flex; gap: 16px; align-items: center; }
+
+  .btn {
+    font-family: 'Jost', sans-serif; font-weight: 400; font-size: 13px;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    background: transparent; color: var(--parch-dim);
+    border: 1px solid var(--panel); border-radius: 2px;
+    padding: 8px 14px; cursor: pointer; transition: all 0.2s ease;
+  }
+  .btn:hover { color: var(--ember-lt); border-color: var(--ember-dim); }
+  .btn-primary {
+    background: var(--ember); color: var(--ink); border-color: var(--ember);
+    font-weight: 500;
+  }
+  .btn-primary:hover { background: var(--ember-lt); border-color: var(--ember-lt); color: var(--ink); }
+
+  /* Sign-in card */
+  .signin {
+    max-width: 420px; margin: 80px auto 0;
+    background: var(--chamber); border: 1px solid var(--panel); border-radius: 4px;
+    padding: 40px 32px;
+  }
+  .signin h1 { font-family: 'Cinzel', serif; font-weight: 600; color: var(--parch); margin: 0 0 6px; font-size: 22px; letter-spacing: 0.06em; }
+  .signin p { color: var(--parch-dk); margin: 0 0 24px; font-size: 15px; }
+  .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+  .field label { font-family: 'Jost', sans-serif; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--parch-dk); }
+  .field input {
+    font-family: 'Jost', sans-serif; font-size: 15px;
+    background: var(--ink); color: var(--parch);
+    border: 1px solid var(--panel); border-radius: 2px;
+    padding: 12px 14px; outline: none; transition: border-color 0.2s ease;
+  }
+  .field input:focus { border-color: var(--ember-dim); }
+  .err {
+    color: #E5A07A; font-size: 13px; min-height: 18px; margin-top: 4px;
+    font-family: 'Jost', sans-serif;
+  }
+
+  /* Toolbar */
+  .toolbar {
+    display: flex; gap: 12px; flex-wrap: wrap; align-items: center;
+    margin-bottom: 20px;
+  }
+  .toolbar input[type="search"] {
+    flex: 1; min-width: 220px;
+    font-family: 'Jost', sans-serif; font-size: 14px;
+    background: var(--deep); color: var(--parch);
+    border: 1px solid var(--panel); border-radius: 2px;
+    padding: 10px 14px; outline: none;
+  }
+  .toolbar input[type="search"]:focus { border-color: var(--ember-dim); }
+  .toolbar select {
+    font-family: 'Jost', sans-serif; font-size: 14px;
+    background: var(--deep); color: var(--parch);
+    border: 1px solid var(--panel); border-radius: 2px;
+    padding: 10px 14px; outline: none;
+  }
+
+  /* Table */
+  .tbl-wrap { overflow-x: auto; border: 1px solid var(--panel); border-radius: 4px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  thead {
+    background: var(--deep);
+    font-family: 'Jost', sans-serif; font-weight: 400;
+    color: var(--parch-dk);
+    text-transform: uppercase; letter-spacing: 0.1em; font-size: 11px;
+  }
+  th, td { padding: 12px 14px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--panel); }
+  th { -webkit-user-select: none; user-select: none; cursor: pointer; white-space: nowrap; }
+  th:hover { color: var(--ember-lt); }
+  tbody tr:hover { background: rgba(193, 125, 42, 0.04); }
+  td.col-when { color: var(--parch-dim); white-space: nowrap; font-family: 'Jost', sans-serif; font-size: 12px; }
+  td.col-type { font-family: 'Jost', sans-serif; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ember-lt); white-space: nowrap; }
+  td.col-name { color: var(--parch); font-weight: 600; white-space: nowrap; }
+  td.col-email { color: var(--parch-dim); font-family: 'Jost', sans-serif; font-size: 13px; white-space: nowrap; }
+  td.col-role { color: var(--parch-dim); font-family: 'Jost', sans-serif; font-size: 13px; }
+  td.col-msg { color: var(--parch-dim); max-width: 380px; }
+  td.col-status { font-family: 'Jost', sans-serif; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--parch-dk); }
+
+  .empty { text-align: center; padding: 60px 20px; color: var(--parch-dk); font-style: italic; }
+
+  /* Mobile */
+  @media (max-width: 720px) {
+    body { padding: 20px 14px; }
+    .brand { font-size: 18px; }
+    .head { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+<div class="shell" id="shell">
+  <noscript>This admin view requires JavaScript.</noscript>
+</div>
+
+<script>
+  const shell = document.getElementById('shell');
+
+  function el(tag, attrs = {}, ...children) {
+    const node = document.createElement(tag);
+    for (const [k, v] of Object.entries(attrs)) {
+      if (k === 'class') node.className = v;
+      else if (k.startsWith('on') && typeof v === 'function') node.addEventListener(k.slice(2), v);
+      else node.setAttribute(k, v);
+    }
+    for (const child of children) {
+      if (child == null) continue;
+      node.appendChild(typeof child === 'string' ? document.createTextNode(child) : child);
+    }
+    return node;
+  }
+
+  function fmtDate(iso) {
+    if (!iso) return '';
+    const d = new Date(iso.replace(' ', 'T') + 'Z');
+    if (isNaN(d.getTime())) return iso;
+    return d.toLocaleString(undefined, {
+      year: 'numeric', month: 'short', day: 'numeric',
+      hour: '2-digit', minute: '2-digit',
+    });
+  }
+
+  function renderSignin(errorMsg) {
+    shell.replaceChildren();
+    const form = el('form', { class: 'signin' });
+    form.appendChild(el('h1', {}, 'The Scriptorium'));
+    form.appendChild(el('p', {}, 'Records of those who have answered the call.'));
+
+    const field = el('div', { class: 'field' });
+    field.appendChild(el('label', { for: 'pw' }, 'Passphrase'));
+    field.appendChild(el('input', { type: 'password', id: 'pw', name: 'password', autocomplete: 'current-password', required: 'true', autofocus: 'true' }));
+    form.appendChild(field);
+
+    const err = el('div', { class: 'err' });
+    if (errorMsg) err.textContent = errorMsg;
+    form.appendChild(err);
+
+    const btn = el('button', { class: 'btn btn-primary', type: 'submit' }, 'Enter');
+    form.appendChild(btn);
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      btn.disabled = true;
+      btn.textContent = 'Entering…';
+      err.textContent = '';
+      try {
+        const res = await fetch('/api/admin/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'same-origin',
+          body: JSON.stringify({ password: form.password.value }),
+        });
+        if (res.ok) {
+          loadAndRender();
+          return;
+        }
+        const json = await res.json().catch(() => ({}));
+        err.textContent = json.error || 'Sign-in failed';
+      } catch {
+        err.textContent = 'Network error';
+      }
+      btn.disabled = false;
+      btn.textContent = 'Enter';
+    });
+
+    shell.appendChild(form);
+  }
+
+  function renderTable(payload) {
+    shell.replaceChildren();
+
+    const head = el('header', { class: 'head' });
+    const titles = el('div');
+    titles.appendChild(el('h1', { class: 'brand' }, 'The Scriptorium'));
+    titles.appendChild(el('p', { class: 'sub' }, `${payload.count} submission${payload.count === 1 ? '' : 's'}`));
+    head.appendChild(titles);
+
+    const actions = el('div', { class: 'meta' });
+    const logout = el('button', { class: 'btn', type: 'button', onclick: doLogout }, 'Sign out');
+    actions.appendChild(logout);
+    head.appendChild(actions);
+    shell.appendChild(head);
+
+    const toolbar = el('div', { class: 'toolbar' });
+    const search = el('input', { type: 'search', placeholder: 'Search name, email, message…' });
+    const typeFilter = el('select');
+    typeFilter.appendChild(el('option', { value: '' }, 'All types'));
+    typeFilter.appendChild(el('option', { value: 'teacher' }, 'Teacher'));
+    typeFilter.appendChild(el('option', { value: 'circle' }, 'Community'));
+    toolbar.appendChild(search);
+    toolbar.appendChild(typeFilter);
+    shell.appendChild(toolbar);
+
+    const wrap = el('div', { class: 'tbl-wrap' });
+    const table = el('table');
+    const thead = el('thead');
+    const headRow = el('tr');
+    const cols = [
+      { key: 'created_at', label: 'When' },
+      { key: 'type', label: 'Type' },
+      { key: 'name', label: 'Name' },
+      { key: 'email', label: 'Email' },
+      { key: 'role', label: 'Role' },
+      { key: 'message', label: 'Message' },
+      { key: 'status', label: 'Status' },
+    ];
+    let sortKey = 'created_at';
+    let sortDir = 'desc';
+    cols.forEach((c) => {
+      const th = el('th', { onclick: () => { if (sortKey === c.key) sortDir = sortDir === 'asc' ? 'desc' : 'asc'; else { sortKey = c.key; sortDir = 'asc'; } redraw(); } }, c.label);
+      headRow.appendChild(th);
+    });
+    thead.appendChild(headRow);
+    table.appendChild(thead);
+
+    const tbody = el('tbody');
+    table.appendChild(tbody);
+    wrap.appendChild(table);
+    shell.appendChild(wrap);
+
+    function redraw() {
+      tbody.replaceChildren();
+      const q = search.value.trim().toLowerCase();
+      const t = typeFilter.value;
+      const filtered = payload.submissions
+        .filter((s) => !t || s.type === t)
+        .filter((s) => {
+          if (!q) return true;
+          return (
+            (s.name || '').toLowerCase().includes(q) ||
+            (s.email || '').toLowerCase().includes(q) ||
+            (s.message || '').toLowerCase().includes(q)
+          );
+        })
+        .sort((a, b) => {
+          const av = a[sortKey] ?? '';
+          const bv = b[sortKey] ?? '';
+          if (av < bv) return sortDir === 'asc' ? -1 : 1;
+          if (av > bv) return sortDir === 'asc' ? 1 : -1;
+          return 0;
+        });
+
+      if (filtered.length === 0) {
+        const row = el('tr');
+        row.appendChild(el('td', { colspan: '7', class: 'empty' }, q || t ? 'No matches.' : 'No submissions yet. The gates are quiet.'));
+        tbody.appendChild(row);
+        return;
+      }
+
+      for (const s of filtered) {
+        const tr = el('tr');
+        tr.appendChild(el('td', { class: 'col-when' }, fmtDate(s.created_at)));
+        tr.appendChild(el('td', { class: 'col-type' }, s.type === 'teacher' ? 'Teacher' : 'Community'));
+        tr.appendChild(el('td', { class: 'col-name' }, s.name || ''));
+        tr.appendChild(el('td', { class: 'col-email' }, s.email || ''));
+        tr.appendChild(el('td', { class: 'col-role' }, s.role || '—'));
+        tr.appendChild(el('td', { class: 'col-msg' }, s.message || '—'));
+        tr.appendChild(el('td', { class: 'col-status' }, s.status || ''));
+        tbody.appendChild(tr);
+      }
+    }
+
+    search.addEventListener('input', redraw);
+    typeFilter.addEventListener('change', redraw);
+    redraw();
+  }
+
+  async function loadAndRender() {
+    try {
+      const res = await fetch('/api/admin', { credentials: 'same-origin' });
+      if (res.status === 401) {
+        renderSignin();
+        return;
+      }
+      if (!res.ok) {
+        renderSignin('Could not load submissions');
+        return;
+      }
+      const data = await res.json();
+      renderTable(data);
+    } catch {
+      renderSignin('Network error');
+    }
+  }
+
+  async function doLogout() {
+    try {
+      await fetch('/api/admin/logout', { method: 'POST', credentials: 'same-origin' });
+    } catch {}
+    renderSignin();
+  }
+
+  loadAndRender();
+</script>
+</body>
+</html>

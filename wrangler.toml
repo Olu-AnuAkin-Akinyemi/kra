@@ -1,0 +1,7 @@
+name = "kra-academy"
+compatibility_date = "2024-09-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "kra_db"
+database_id = "81d6d17b-1e4e-4174-ac6f-d6e60d855ffb"

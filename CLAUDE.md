@@ -246,6 +246,7 @@ Students whose lineage has been obscured by slavery, colonization, forced migrat
 | Single HTML file for MVP website | Easiest to deploy, share, and host before infrastructure is in place |
 | Campus section naming (Gates, Courtyard, Halls...) | Site should feel like moving through a place, not scrolling a webpage |
 | Warm amber/terracotta palette | Timbuktu earthen warmth alongside Kemetic midnight depth — away from cool/imperial aesthetic |
+| Backend Pages Functions stay JS until 3–5 endpoints exist | Matches the vanilla-JS frontend; setup cost of TS (tsconfig, `@cloudflare/workers-types`, typescript devDep) doesn't pay back at 2 endpoints. Mixing `.ts` and `.js` in `functions/` is supported, so migration is cheap when the trigger hits. |
 
 ---
 

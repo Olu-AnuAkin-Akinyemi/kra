@@ -1047,6 +1047,18 @@ nav{
   transition:all 0.3s;
 }
 .f-submit:hover{background:var(--ember-lt);transform:translateY(-1px);}
+.f-submit:disabled{
+  background:var(--ember-dim);cursor:wait;
+  transform:none;opacity:0.7;
+}
+.f-error{
+  font-family:var(--sans);font-size:0.78rem;
+  color:#E5A07A;background:rgba(124,59,30,0.12);
+  border-left:2px solid var(--terra);
+  padding:0.6rem 0.85rem;margin-top:0.2rem;
+  letter-spacing:0.02em;
+}
+.f-error:empty{display:none;}
 .f-note{
   font-family:var(--serif);font-size:0.82rem;
   font-style:italic;color:var(--parch-dk);text-align:center;
