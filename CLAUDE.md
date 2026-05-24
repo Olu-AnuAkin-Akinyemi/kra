@@ -254,7 +254,6 @@ Students whose lineage has been obscured by slavery, colonization, forced migrat
 
 - Individual lesson pages within Grimora (routing + content display)
 - A formal teacher application backend (currently form is UI-only)
-- Email capture integration (Mailchimp / ConvertKit / Airtable)
 - Badge and sleeve visual assets (photography / illustration)
 - Crowdfunding campaign page
 - Self-defense program details (acknowledged as future — no structure yet)

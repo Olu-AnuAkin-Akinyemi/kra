@@ -67,3 +67,29 @@
 - Confirm actual domain and do global find-replace of `kemknightrangeracademy.com` placeholder.
 - Update `sitemap.xml` `<lastmod>` to today's date.
 - Review whether agent roles are too broad or too narrow for collaborative work.
+
+---
+
+### 2026-05-24 — D1 production verification & binding-bug workaround
+
+**Done:**
+- Diagnosed and fixed production 500s on `POST /api/submit` and `GET /api/admin`. Both were caused by `env.DB` being undefined at runtime — the D1 binding set in the Cloudflare dashboard was not propagating to the Pages Functions runtime, even after delete/re-add on Production scope and a fresh deploy.
+- Root fix: added `pages_build_output_dir = "dist"` to `wrangler.toml`. Without that line, Cloudflare Pages logs `A Wrangler configuration file was found but it does not appear to be valid... Skipping file` and ignores the whole file — including `[[d1_databases]]`. With it present, the binding block is read and `env.DB` attaches correctly at deploy time. First request after that deploy returned 200.
+- Added defensive `console.error('… failed:', err?.message, err?.stack, 'DB bound:', !!env.DB)` to the catch blocks in `functions/api/submit.js` and `functions/api/admin.js`. The handlers return generic JSON to the client (no leaked stack traces) so this was the only way to surface the real exception.
+- Full smoke test passed: form submit → 200, admin login/logout/listing → 200, one verified row in production D1.
+- Cleanup: struck "Email capture integration" from `CLAUDE.md` Future Build Targets (now shipped); deleted local `D1-INTEGRATION-PLAN.md` (gitignored, served its purpose).
+
+**Learned:**
+- Cloudflare Pages dashboard bindings for D1 do **not** reliably propagate to the Pages Functions runtime — even with the binding visible under Production scope, no Preview/Production confusion, and a fresh deploy post-binding. The reliable path is `[[d1_databases]]` in `wrangler.toml`, which requires `pages_build_output_dir` to be set so Pages doesn't skip the file.
+- Cloudflare's `Errors 0%` metric in the Functions panel only counts uncaught exceptions. Handlers that catch and return a 500 JSON look like "success" in that chart. Don't trust the chart for handler health — confirm with the runtime tail.
+- Runtime logs via CLI are easier than the dashboard UI: `npx wrangler pages deployment tail --project-name=kra`. List projects first with `npx wrangler pages project list` — our Cloudflare project is named **`kra`**, not `kra-eoz` (that's just the assigned subdomain).
+- The `wrangler.toml` local-vs-prod conflict: `pages_build_output_dir` (required for prod D1 binding) and `wrangler pages dev -- npm run dev` (proxy mode for local dev) are mutually exclusive in wrangler 4 — `Specify either a directory OR a proxy command, not both`. So the line that's required for production breaks local dev.
+
+**Decisions:**
+- `wrangler.toml` keeps `pages_build_output_dir = "dist"` as the committed default. Local dev requires manually commenting that line out, then restoring before commit. Pre-commit check: verify the line is present, else `env.DB` silently breaks in prod.
+- Dashboard `DB` binding left in place but is now redundant (wrangler.toml authoritative). No harm leaving it.
+- Diagnostic `console.error` lines kept in `submit.js` and `admin.js` — useful for distinguishing binding bugs from data bugs, low noise (only fires on errors), no leaked stack traces to clients.
+
+**Next:**
+- **SVG mobile rendering bug** (still queued from yesterday): on live mobile, the `<!-- Celestial geometry -->` and `<!-- Timbuktu-style arch silhouette -->` SVG backgrounds in `index.html` hero don't render. Independent of D1 work.
+- If `wrangler.toml` toggling becomes annoying, evaluate `--config wrangler.dev.toml` or a `[env.local]` block as cleaner alternatives.
