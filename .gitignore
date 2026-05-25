@@ -37,5 +37,8 @@ yarn-error.log*
 # Test coverage
 coverage/
 
+# Reference Docs
+Grimora_ref/
+
 # Ephemeral planning docs (delete after milestone ships)
 D1-INTEGRATION-PLAN.md

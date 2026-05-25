@@ -882,6 +882,93 @@ nav{
   font-style:italic;color:var(--parch-dim);line-height:1.75;
 }
 
+/* ── GRIMORA / THE SCRIPTORIUM ── */
+#grimora{
+  background:var(--ink);
+  border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+  overflow:hidden;
+  position:relative;
+}
+#grimora::before{
+  content:'';position:absolute;
+  top:0;left:0;right:0;height:3px;
+  background:linear-gradient(to right,var(--star-dim),var(--star),var(--ember),transparent);
+}
+.grimora-header{max-width:580px;margin-bottom:4rem;}
+.grimora-intro{
+  display:grid;grid-template-columns:220px 1fr;
+  gap:4rem;align-items:center;
+  margin-bottom:5rem;
+}
+.grimora-orb-wrap{
+  display:flex;align-items:center;justify-content:center;
+}
+.grimora-orb{
+  width:150px;height:150px;
+  border-radius:50%;
+  background:radial-gradient(circle at 38% 32%,#ffffff 0%,var(--star) 28%,var(--ember) 58%,transparent 76%);
+  box-shadow:
+    0 0 40px 16px rgba(200,216,240,0.12),
+    0 0 80px 30px rgba(193,125,42,0.08),
+    inset 0 0 20px rgba(200,216,240,0.06);
+  animation:grimora-pulse 5s ease-in-out infinite;
+}
+@keyframes grimora-pulse{
+  0%,100%{box-shadow:0 0 40px 16px rgba(200,216,240,0.12),0 0 80px 30px rgba(193,125,42,0.08);}
+  50%    {box-shadow:0 0 60px 24px rgba(200,216,240,0.22),0 0 120px 48px rgba(193,125,42,0.14);}
+}
+.grimora-body{
+  font-family:var(--serif);font-size:1.05rem;
+  color:var(--parch-dim);line-height:1.8;
+  margin-bottom:1.25rem;
+}
+.grimora-status{
+  display:inline-block;
+  font-family:var(--sans);font-size:0.6rem;
+  letter-spacing:0.38em;text-transform:uppercase;
+  color:var(--star);
+  border:1px solid rgba(200,216,240,0.25);
+  padding:0.3rem 0.85rem;margin-top:0.5rem;
+}
+.grimora-halls-wrap{margin-bottom:3rem;}
+.grimora-halls-label{
+  font-family:var(--sans);font-size:0.6rem;
+  letter-spacing:0.38em;text-transform:uppercase;
+  color:var(--parch-dk);margin-bottom:1.5rem;
+}
+.grimora-hall-grid{
+  display:grid;grid-template-columns:repeat(2,1fr);
+  gap:1px;background:var(--border);
+}
+.grimora-hall{
+  background:var(--deep);padding:2.25rem 2rem;
+  border-top:2px solid transparent;
+  transition:border-color 0.3s,background 0.3s;
+}
+.grimora-hall:hover{background:var(--chamber);border-color:var(--star-dim);}
+.grimora-hall-glyph{font-size:1.5rem;margin-bottom:0.85rem;line-height:1;}
+.grimora-hall-name{
+  font-family:var(--display);font-size:0.95rem;
+  color:var(--parch);margin-bottom:0.3rem;letter-spacing:0.04em;
+}
+.grimora-hall-sub{
+  font-family:var(--sans);font-size:0.62rem;
+  letter-spacing:0.15em;text-transform:uppercase;
+  color:var(--star-dim);margin-bottom:0.85rem;display:block;
+}
+.grimora-hall-desc{
+  font-family:var(--serif);font-size:0.92rem;
+  color:var(--parch-dk);line-height:1.7;
+}
+.grimora-quote{
+  margin:0;padding:2.5rem;
+  background:var(--chamber);
+  border-left:3px solid var(--star-dim);
+  font-family:var(--serif);font-size:1.15rem;
+  font-style:italic;color:var(--parch-dim);line-height:1.75;
+}
+
 /* ── MAP ROOM (VISION) ── */
 #maproom{
   background:var(--ink);
@@ -1148,6 +1235,9 @@ footer{
     grid-template-columns:1fr;gap:2.5rem;
   }
   .halls-grid{grid-template-columns:1fr;}
+  .grimora-intro{grid-template-columns:1fr;gap:2.5rem;}
+  .grimora-orb-wrap{justify-content:flex-start;}
+  .grimora-hall-grid{grid-template-columns:1fr;}
   .case-grid{grid-template-columns:1fr 1fr;}
   .steam-strip{grid-template-columns:1fr;gap:1.5rem;}
   .foot-top{grid-template-columns:1fr;gap:2.5rem;}
