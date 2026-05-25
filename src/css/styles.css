@@ -537,6 +537,14 @@ nav{
   font-family:var(--serif);font-size:1rem;
   color:var(--parch-dk);line-height:1.75;
 }
+.hall-link{
+  display:inline-block;margin-top:1rem;
+  font-family:var(--sans);font-size:0.65rem;
+  letter-spacing:0.15em;text-transform:uppercase;
+  color:var(--ember-dim);text-decoration:none;
+  transition:color 0.2s;
+}
+.hall-link:hover{color:var(--ember);}
 
 /* STEAM strip */
 .steam-strip{
@@ -1102,6 +1110,24 @@ nav{
 .enroll-card::before{
   content:'';position:absolute;top:0;left:0;right:0;height:2px;
   background:linear-gradient(to right,var(--ember-dim),transparent);
+}
+.enroll-card--teacher{
+  border-color:var(--border-md);
+}
+.enroll-card--teacher::before{
+  background:linear-gradient(to right,var(--ember),var(--ember-dim),transparent);
+}
+.enroll-badge{
+  display:inline-block;
+  font-family:var(--sans);font-size:0.58rem;letter-spacing:0.28em;
+  text-transform:uppercase;color:var(--ember);
+  background:rgba(193,125,42,0.1);
+  padding:0.25rem 0.7rem;margin-bottom:0.9rem;
+}
+.enroll-review-note{
+  font-family:var(--serif);font-size:0.82rem;
+  font-style:italic;color:var(--parch-dk);
+  text-align:center;margin-top:0.65rem;
 }
 .enroll-title{
   font-family:var(--display);font-size:1.3rem;
